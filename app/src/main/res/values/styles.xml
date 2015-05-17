@@ -1,0 +1,21 @@
+<resources>
+
+    <style name="MainTheme" parent="MaterialNavigationDrawerTheme.Light.DarkActionBar">
+        <item name="colorPrimary">#f5bc4c</item>
+        <item name="colorPrimaryDark">#c8993f</item>
+        <item name="colorAccent">#aa3b25</item>
+
+        <item name="singleAccount">true</item>
+    </style>
+
+    <style name="ActivityTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#f5bc4c</item>
+        <item name="colorPrimaryDark">#c8993f</item>
+        <item name="colorAccent">#aa3b25</item>
+    </style>
+
+    <style name="ProgressBarStyle">
+        <item name="colorAccent">#FFFFFF</item>
+    </style>
+
+</resources>
