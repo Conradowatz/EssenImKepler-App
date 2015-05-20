@@ -28,6 +28,7 @@ public class LoadingDataActivity extends ActionBarActivity implements View.OnCli
 
     private String email;
     private String password;
+    private EssenAPI essenAPI = new EssenAPI();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class LoadingDataActivity extends ActionBarActivity implements View.OnCli
 
     public void downloadInfo() {
 
-        EssenAPI.login(email, password, new TextHttpResponseHandler() {
+        essenAPI.login(email, password, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 noConnection();
@@ -138,6 +139,7 @@ public class LoadingDataActivity extends ActionBarActivity implements View.OnCli
 
         isnoConnection = false;
 
+        essenAPI.reCreateClient();
         downloadInfo();
 
 

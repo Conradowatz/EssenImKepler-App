@@ -19,11 +19,13 @@ import org.apache.http.Header;
 
 public class LoginActivity extends ActionBarActivity {
 
-    EditText loginEmailEdit;
-    EditText loginPasswordEdit;
-    Button loginButton;
-    ProgressBar loginProgressBar;
-    TextView loginErrorTextView;
+    private EditText loginEmailEdit;
+    private EditText loginPasswordEdit;
+    private Button loginButton;
+    private ProgressBar loginProgressBar;
+    private TextView loginErrorTextView;
+
+    private EssenAPI essenAPI = new EssenAPI();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +100,7 @@ public class LoginActivity extends ActionBarActivity {
 
     public void checkLogin(final String email, final String password) {
 
-        EssenAPI.login(email, password, new TextHttpResponseHandler() {
+        essenAPI.login(email, password, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 //Keine Verbindung zum Server
@@ -112,11 +114,8 @@ public class LoginActivity extends ActionBarActivity {
                 //Verbindung hergestellt
                 if (responseString.contains("Benutzeranmeldung")) {
                     //Falsche Benutzerdaten
-
                     //Fehler anzeigen
                     loginError(EssenAPI.LOGIN_FAILED);
-
-
                 }
 
                 if (responseString.contains("Angemeldet")) {
@@ -143,6 +142,7 @@ public class LoginActivity extends ActionBarActivity {
             loginErrorTextView.setText("Login fehlgeschlagen: Falsche Benutzerdaten");
         } else {
             loginErrorTextView.setText("Login fehlgeschlagen: Keine Verbindung zum Server");
+            essenAPI.reCreateClient();
         }
 
         loginErrorTextView.setVisibility(View.VISIBLE);

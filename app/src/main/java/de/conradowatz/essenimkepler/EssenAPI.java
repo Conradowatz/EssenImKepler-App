@@ -16,9 +16,9 @@ public class EssenAPI {
     public static int LOGIN_FAILED = 91;
     public static int NO_CONNECTION = 92;
 
-    private static AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
+    private AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
 
-    public static void login(final String email, final String password, final AsyncHttpResponseHandler responseHandler) {
+    public void login(final String email, final String password, final AsyncHttpResponseHandler responseHandler) {
 
         //Verbindung aufbauen
         client.get("https://essen-im-kepler.de/order.jsp", new AsyncHttpResponseHandler() {
@@ -85,6 +85,10 @@ public class EssenAPI {
         }
 
         return essenListe;
+    }
+
+    public void reCreateClient() {
+        client = new AsyncHttpClient(true, 80, 443);
     }
 
 }
