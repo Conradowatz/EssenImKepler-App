@@ -7,4 +7,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_login">Einloggen</string>
     <string name="title_activity_loading_data">LoadingDataActivity</string>
+    <string name="lade_daten">Lade Daten...</string>
+    <string name="serverprobleme_error">Keine Verbindung zum Server. \nZum erneut Versuchen tippen.</string>
+    <string name="willkommens_text">Willkommen bei Essen im Kepler. Bitte logge dich mit deinen Benutzerdaten an, um die App nutzen zu können!</string>
 </resources>

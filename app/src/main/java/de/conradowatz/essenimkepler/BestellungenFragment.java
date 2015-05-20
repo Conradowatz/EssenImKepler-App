@@ -18,7 +18,6 @@ public class BestellungenFragment extends Fragment {
 
     private View contentView;
     private RecyclerView tagRecycler;
-    private boolean hasInfo = false;
 
 
     public BestellungenFragment() {
@@ -29,8 +28,6 @@ public class BestellungenFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        Log.d("LOGY", "Bestellungen onCreate");
 
         contentView = inflater.inflate(R.layout.fragment_bestellungen, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.bestellungen_recyclerView);
@@ -43,20 +40,13 @@ public class BestellungenFragment extends Fragment {
         MultiTagAdapter mAdapter = new MultiTagAdapter(getActivity(), new ArrayList<EssenTag>());
         tagRecycler.setAdapter(mAdapter);
 
-        if ((savedInstanceState!=null)||(hasInfo)) {
-            displayInfo(((MainActivity)getActivity()).html);
-        }
+        displayInfo(((MainActivity)getActivity()).essenListe);
 
         return contentView;
     }
 
-    public void displayInfo(String html) {
+    public void displayInfo(List<EssenTag> essenListe) {
 
-        hasInfo = true;
-
-        Log.d("LOGY", "Bestellungen display");
-
-        List<EssenTag> essenListe = EssenAPI.parseHTML(html);
         List<EssenTag> bestellungsListe = new ArrayList<>();
 
         //nur selektierte Essen aussortieren

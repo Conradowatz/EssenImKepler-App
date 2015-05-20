@@ -15,7 +15,7 @@
         android:src="@drawable/logo"/>
 
     <TextView
-        android:text="Willkommen bei Essen im Kepler. Bitte logge dich mit deinen Benutzerdaten an, um die App nutzen zu können!"
+        android:text="@string/willkommens_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/primary_text"

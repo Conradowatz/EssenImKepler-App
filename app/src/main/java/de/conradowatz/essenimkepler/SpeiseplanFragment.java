@@ -28,27 +28,16 @@ public class SpeiseplanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        Log.d("LOGY", "Speiseplan onCreate");
-
         contentView = inflater.inflate(R.layout.fragment_speiseplan, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.speisePlan_recyclerView);
 
-        displayInfo(((MainActivity)getActivity()).html);
+        displayInfo(((MainActivity)getActivity()).essenListe);
 
         return contentView;
     }
 
-    public void displayInfo(String html) {
+    public void displayInfo(List<EssenTag> essenListe) {
 
-        Log.d("LOGY", "Speiseplan info");
-
-        if (html==null) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-            html = mainActivity.getHtml();
-        }
-
-        List<EssenTag> essenListe = EssenAPI.parseHTML(html);
         List<EssenTag> speisePlan = new ArrayList<>();
 
         //Verzicht aussortieren

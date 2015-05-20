@@ -84,7 +84,7 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
         //Datum setzen
         holder.dateText.setText(essenTag.datum);
 
-        //Wenn der heutige Tag -> highlighten
+        //Wenn der heutige Tag -> highlighten, anzeigen
         String date = essenTag.datum.split(",")[1];
         Date stringDate = new SimpleDateFormat("dd.MM.yyyy").parse(date, new ParsePosition(0));
         Calendar currentCalendar = Calendar.getInstance();
@@ -95,14 +95,12 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
             holder.specailDayText.setText("HEUTE");
             holder.specailDayText.setVisibility(View.VISIBLE);
 
-        } else {
-            holder.specailDayText.setVisibility(View.INVISIBLE);
-        }
-        if (currentCalendar.get(Calendar.DAY_OF_YEAR)+1==dayCalendar.get(Calendar.DAY_OF_YEAR)) {
+        } else if (currentCalendar.get(Calendar.DAY_OF_YEAR)+1==dayCalendar.get(Calendar.DAY_OF_YEAR)) {
             holder.specailDayText.setText("MORGEN");
             holder.specailDayText.setVisibility(View.VISIBLE);
         } else {
             holder.specailDayText.setVisibility(View.INVISIBLE);
+            holder.highlight.setVisibility(View.INVISIBLE);
         }
 
         addMealstoLayout(essenTag.essens, holder.mealLayout);

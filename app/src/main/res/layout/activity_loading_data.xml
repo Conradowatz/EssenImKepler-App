@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="Lade Daten..."
+        android:text="@string/lade_daten"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"/>
@@ -43,7 +43,7 @@
 
     <TextView
         android:id="@+id/loadingData_noconnection_textView"
-        android:text="Keine Verbindung zum Server. \nZum erneut Versuchen tippen."
+        android:text="@string/serverprobleme_error"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/loadingData_cloud_imageView"
         android:textColor="@color/warn_text"

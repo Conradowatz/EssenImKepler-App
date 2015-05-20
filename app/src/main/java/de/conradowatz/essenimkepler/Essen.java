@@ -1,6 +1,9 @@
 package de.conradowatz.essenimkepler;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 public class Essen {
 
     public String desc;

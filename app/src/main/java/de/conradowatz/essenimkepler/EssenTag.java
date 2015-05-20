@@ -1,6 +1,9 @@
 package de.conradowatz.essenimkepler;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +21,6 @@ public class EssenTag {
 
     public EssenTag() {
 
-        essens = new ArrayList<Essen>();
+        essens = new ArrayList<>();
     }
-
 }

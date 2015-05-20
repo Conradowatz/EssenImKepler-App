@@ -1,59 +1,120 @@
 package de.conradowatz.essenimkepler;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
-import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
-import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
-import it.neokree.materialnavigationdrawer.elements.MaterialSection;
-import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class MainActivity extends MaterialNavigationDrawer implements MaterialSectionListener {
+public class MainActivity extends AppCompatActivity {
 
-    public String html;
-    private BestellungenFragment bestellungenFragment = new BestellungenFragment();
-    private SpeiseplanFragment speiseplanFragment = new SpeiseplanFragment();
-    private MaterialSection abmeldenSection;
-    private  AlertDialog abmeldeDialog;
+    private String html;
+    public List<EssenTag> essenListe;
+    private BestellungenFragment bestellungenFragment;
+    private SpeiseplanFragment speiseplanFragment;
+    private AlertDialog abmeldeDialog;
+
+    private AccountHeader.Result accountHeaderResult;
+    private Drawer.Result drawerResult;
+    private ProfileDrawerItem profileDrawerItem;
+    private android.support.v7.widget.Toolbar toolbar;
+
 
     @Override
-    public void init(Bundle bundle) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        //Sections zum NavDrawer hinzufügen
-        addSection( newSection("Meine Bestellungen", bestellungenFragment) );
-        addSection( newSection("Speiseplan", speiseplanFragment) );
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        abmeldenSection = newSection("Abmelden", this);
-        addBottomSection(abmeldenSection);
-
-        //Drawer Bilder anzeigen
         String email = PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "");
-        MaterialAccount account = new MaterialAccount(this.getResources(),email,"",R.drawable.logo, R.drawable.spaghetti);
-        this.addAccount(account);
+        profileDrawerItem = new ProfileDrawerItem().withName(email).withEmail("").withIcon(getResources().getDrawable(R.drawable.logo));
 
-        if (bundle!=null) {
+        accountHeaderResult = new AccountHeader()
+                .withActivity(this)
+                .withTextColorRes(R.color.primary_text)
+                .withHeaderBackground(R.drawable.spaghetti)
+                .withSelectionListEnabledForSingleProfile(false)
+                .addProfiles(
+                        profileDrawerItem
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
+
+        ArrayList<IDrawerItem> footerList = new ArrayList<>();
+        footerList.add( new PrimaryDrawerItem().withName("Infos").withIcon(R.drawable.ic_info).withIdentifier(1) );
+        footerList.add( new PrimaryDrawerItem().withName("Abmelden").withIcon(R.drawable.ic_arrow_back).withIdentifier(2) );
+
+        drawerResult = new Drawer()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(accountHeaderResult)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Meine Bestellungen").withIcon(R.drawable.ic_bestellungen),
+                        new PrimaryDrawerItem().withName("Speiseplan").withIcon(R.drawable.ic_speiseplan)
+                )
+                .withStickyFooterDivider(true)
+                .withStickyDrawerItems(footerList)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                        if (position >= 0) {
+                            setFragment(position);
+                        } else {
+                            drawerResult.setSelection(drawerResult.getCurrentSelection());
+                            if (drawerItem.getIdentifier() == 1) {
+                                showInfoDialog();
+                            } else if (drawerItem.getIdentifier() == 2) {
+                                logOutClicked();
+                            }
+                        }
+                    }
+                })
+                .withSelectedItem(0)
+                .build();
+
+        if (savedInstanceState!=null) {
             //bei resume html aus bundle holen
-            html = bundle.getString("essenListeHtml");
+            html = savedInstanceState.getString("essenListeHtml");
+            essenListe = EssenAPI.parseHTML(html);
+            drawerResult.setSelection(savedInstanceState.getInt("selectedSection"));
         } else {
-            checkForFirstStart();
+            logIn();
         }
 
     }
 
-    @Override
-    public void onClick(MaterialSection section) {
-        super.onClick(section);
+    public void logOutClicked() {
 
-        if (section==abmeldenSection) {
-
-            if ((abmeldeDialog != null) && (abmeldeDialog.isShowing())) {
-                return;
-            }
             String email = PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "");
 
             AlertDialog.Builder abmeldeDialogB = new AlertDialog.Builder(this);
@@ -64,16 +125,17 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
                 public void onClick(DialogInterface dialogInterface, int i) {
                     PreferenceReader.saveStringToPreferences(getApplicationContext(), "loginEMail", "FALSE");
                     PreferenceReader.saveStringToPreferences(getApplicationContext(), "loginPW", "");
-                    checkForFirstStart();
+                    speiseplanFragment = null;
+                    bestellungenFragment = null;
+                    logIn();
                 }
             });
             abmeldeDialogB.setNegativeButton("Abbrechen", null);
             abmeldeDialog = abmeldeDialogB.show();
-        }
 
     }
 
-    private void checkForFirstStart() {
+    private void logIn() {
 
         if (PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "FALSE").equals("FALSE")) {
 
@@ -86,6 +148,30 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
             Intent openLoadingScreen = new Intent(this, LoadingDataActivity.class);
             final int result = 1;
             startActivityForResult(openLoadingScreen, result);
+        }
+    }
+
+    private void showInfoDialog() {
+
+        LayoutInflater inflater = getLayoutInflater();
+        View scrollView = inflater.inflate(R.layout.infotext_dialog, null);
+        TextView textView = (TextView) scrollView.findViewById(R.id.infoDialog_textView);
+        textView.setText(Html.fromHtml(getString(R.string.infoDialog_text)));
+        textView.setMovementMethod(LinkMovementMethod.getInstance()); //Link klickbar machen
+
+        AlertDialog.Builder infoDialogB = new AlertDialog.Builder(this);
+        infoDialogB.setView(scrollView);
+        infoDialogB.setNeutralButton("Okay", null);
+        infoDialogB.show();
+    }
+
+    private void showDrawerHelp() {
+
+        boolean isDrawerKnown = Boolean.valueOf(PreferenceReader.readStringFromPreferences(getApplicationContext(), "drawerHelp", "false"));
+
+        if (!isDrawerKnown) {
+            PreferenceReader.saveStringToPreferences(getApplicationContext(), "drawerHelp", "true");
+            drawerResult.openDrawer();
         }
     }
 
@@ -103,6 +189,24 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         return super.onOptionsItemSelected(item);
     }
 
+    private void setFragment(int position) {
+
+        FragmentManager mFragmentManager = getFragmentManager();
+        if (position==0) {
+            if (bestellungenFragment==null) {
+                bestellungenFragment = new BestellungenFragment();
+            }
+            mFragmentManager.beginTransaction().replace(R.id.mainActivity_container, bestellungenFragment).commit();
+            toolbar.setTitle("Meine Bestellungen");
+        } else if (position==1) {
+            if (speiseplanFragment==null) {
+                speiseplanFragment = new SpeiseplanFragment();
+            }
+            mFragmentManager.beginTransaction().replace(R.id.mainActivity_container, speiseplanFragment).commit();
+            toolbar.setTitle("Speiseplan");
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
@@ -115,12 +219,16 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
             new VersionUpdater(this).start();
 
+            showDrawerHelp();
+
             html = data.getStringExtra("html");
-            bestellungenFragment.displayInfo(html);
+            essenListe = EssenAPI.parseHTML(html);
+            setFragment(0);
 
             //E-Mail in Drawer anzeigen
             String email = PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "");
-            setUsername(email);
+            profileDrawerItem.setName(email);
+            accountHeaderResult.updateProfileByIdentifier(profileDrawerItem);
         }
     }
 
@@ -129,11 +237,18 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
         //Essenliste speichern
         outState.putString("essenListeHtml", html);
-
+        outState.putInt("selectedSection", drawerResult.getCurrentSelection());
         super.onSaveInstanceState(outState);
     }
 
-    public String getHtml() {
-        return html;
+
+    @Override
+    public void onBackPressed() {
+        //handle the back press :D close the drawer first and if the drawer is closed close the activity
+        if (drawerResult != null && drawerResult.isDrawerOpen()) {
+            drawerResult.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
