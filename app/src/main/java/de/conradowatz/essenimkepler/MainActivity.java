@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private ProfileDrawerItem profileDrawerItem;
     private android.support.v7.widget.Toolbar toolbar;
 
+    private int currentlySelected = 0;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         if (position >= 0) {
-                            setFragment(position);
+                            if (currentlySelected!=position) {
+                                setFragment(position);
+                                currentlySelected = position;
+                            }
                         } else {
                             drawerResult.setSelection(drawerResult.getCurrentSelection());
                             if (drawerItem.getIdentifier() == 1) {
@@ -106,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
             //bei resume html aus bundle holen
             html = savedInstanceState.getString("essenListeHtml");
             essenListe = EssenAPI.parseHTML(html);
-            drawerResult.setSelection(savedInstanceState.getInt("selectedSection"));
+            currentlySelected = savedInstanceState.getInt("selectedSection");
+            drawerResult.setSelection(currentlySelected);
         } else {
             logIn();
         }
