@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -13,16 +14,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 import org.apache.http.Header;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText loginEmailEdit;
     private EditText loginPasswordEdit;
     private Button loginButton;
-    private ProgressBar loginProgressBar;
+    private ProgressWheel loginProgressBar;
     private TextView loginErrorTextView;
 
     private EssenAPI essenAPI = new EssenAPI();
@@ -35,7 +37,7 @@ public class LoginActivity extends ActionBarActivity {
         loginButton = (Button) findViewById(R.id.login_button);
         loginEmailEdit = (EditText) findViewById(R.id.login_email_editText);
         loginPasswordEdit = (EditText) findViewById(R.id.login_password_editText);
-        loginProgressBar = (ProgressBar) findViewById(R.id.login_progressBar);
+        loginProgressBar = (ProgressWheel) findViewById(R.id.login_progressBar);
         loginErrorTextView = (TextView) findViewById(R.id.login_error_textView);
 
         //Wenn auf LOGIN geklickt wird -> einloggen

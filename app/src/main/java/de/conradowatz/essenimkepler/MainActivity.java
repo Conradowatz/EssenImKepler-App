@@ -18,8 +18,11 @@ import android.widget.AdapterView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -37,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private SpeiseplanFragment speiseplanFragment;
     private AlertDialog abmeldeDialog;
 
-    private AccountHeader.Result accountHeaderResult;
-    private Drawer.Result drawerResult;
+    private AccountHeader accountHeader;
+    private Drawer navigationDrawer;
     private ProfileDrawerItem profileDrawerItem;
     private android.support.v7.widget.Toolbar toolbar;
 
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         String email = PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "");
         profileDrawerItem = new ProfileDrawerItem().withName(email).withEmail("").withIcon(getResources().getDrawable(R.drawable.logo));
 
-        accountHeaderResult = new AccountHeader()
+        accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTextColorRes(R.color.primary_text)
                 .withHeaderBackground(R.drawable.spaghetti)
@@ -73,35 +76,37 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         ArrayList<IDrawerItem> footerList = new ArrayList<>();
-        footerList.add( new PrimaryDrawerItem().withName("Infos").withIcon(R.drawable.ic_info).withIdentifier(1) );
-        footerList.add( new PrimaryDrawerItem().withName("Abmelden").withIcon(R.drawable.ic_arrow_back).withIdentifier(2) );
+        footerList.add( new PrimaryDrawerItem().withName("Infos").withIcon(GoogleMaterial.Icon.gmd_info_outline).withIdentifier(1) );
+        footerList.add( new PrimaryDrawerItem().withName("Abmelden").withIcon(GoogleMaterial.Icon.gmd_arrow_back).withIdentifier(2) );
 
-        drawerResult = new Drawer()
+        navigationDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withAccountHeader(accountHeaderResult)
+                .withAccountHeader(accountHeader)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Meine Bestellungen").withIcon(R.drawable.ic_bestellungen),
-                        new PrimaryDrawerItem().withName("Speiseplan").withIcon(R.drawable.ic_speiseplan)
+                        new PrimaryDrawerItem().withName("Meine Bestellungen").withIcon(GoogleMaterial.Icon.gmd_check_box),
+                        new PrimaryDrawerItem().withName("Speiseplan").withIcon(GoogleMaterial.Icon.gmd_local_restaurant)
                 )
                 .withStickyFooterDivider(true)
                 .withStickyDrawerItems(footerList)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                    public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         if (position >= 0) {
                             if (currentlySelected!=position) {
                                 setFragment(position);
                                 currentlySelected = position;
                             }
                         } else {
-                            drawerResult.setSelection(drawerResult.getCurrentSelection());
+                            navigationDrawer.setSelection(currentlySelected, false);
                             if (drawerItem.getIdentifier() == 1) {
                                 showInfoDialog();
                             } else if (drawerItem.getIdentifier() == 2) {
                                 logOutClicked();
                             }
+                            return false;
                         }
+                        return true;
                     }
                 })
                 .withSelectedItem(0)
@@ -112,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             html = savedInstanceState.getString("essenListeHtml");
             essenListe = EssenAPI.parseHTML(html);
             currentlySelected = savedInstanceState.getInt("selectedSection");
-            drawerResult.setSelection(currentlySelected);
+            navigationDrawer.setSelection(currentlySelected);
         } else {
             logIn();
         }
@@ -177,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!isDrawerKnown) {
             PreferenceReader.saveStringToPreferences(getApplicationContext(), "drawerHelp", "true");
-            drawerResult.openDrawer();
+            navigationDrawer.openDrawer();
         }
     }
 
@@ -234,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
             //E-Mail in Drawer anzeigen
             String email = PreferenceReader.readStringFromPreferences(getApplicationContext(), "loginEMail", "");
             profileDrawerItem.setName(email);
-            accountHeaderResult.updateProfileByIdentifier(profileDrawerItem);
+            accountHeader.updateProfileByIdentifier(profileDrawerItem);
         }
     }
 
@@ -243,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Essenliste speichern
         outState.putString("essenListeHtml", html);
-        outState.putInt("selectedSection", drawerResult.getCurrentSelection());
+        outState.putInt("selectedSection", navigationDrawer.getCurrentSelection());
         super.onSaveInstanceState(outState);
     }
 
@@ -251,8 +256,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //handle the back press :D close the drawer first and if the drawer is closed close the activity
-        if (drawerResult != null && drawerResult.isDrawerOpen()) {
-            drawerResult.closeDrawer();
+        if (navigationDrawer != null && navigationDrawer.isDrawerOpen()) {
+            navigationDrawer.closeDrawer();
         } else {
             super.onBackPressed();
         }

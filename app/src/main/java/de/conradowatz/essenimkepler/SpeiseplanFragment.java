@@ -28,6 +28,7 @@ public class SpeiseplanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         contentView = inflater.inflate(R.layout.fragment_speiseplan, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.speisePlan_recyclerView);
 

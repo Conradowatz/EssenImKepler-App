@@ -32,14 +32,6 @@ public class BestellungenFragment extends Fragment {
         contentView = inflater.inflate(R.layout.fragment_bestellungen, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.bestellungen_recyclerView);
 
-        //Recyclerview vorbereiten
-        tagRecycler.setHasFixedSize(true);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        tagRecycler.setLayoutManager(mLayoutManager);
-        MultiTagAdapter mAdapter = new MultiTagAdapter(getActivity(), new ArrayList<EssenTag>());
-        tagRecycler.setAdapter(mAdapter);
-
         displayInfo(((MainActivity)getActivity()).essenListe);
 
         return contentView;
@@ -57,6 +49,10 @@ public class BestellungenFragment extends Fragment {
         }
 
         //Recycler mit Essen vollstopfen
+        tagRecycler.setHasFixedSize(true);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        tagRecycler.setLayoutManager(mLayoutManager);
         MultiTagAdapter mAdapter = new MultiTagAdapter(getActivity(), bestellungsListe);
         tagRecycler.setAdapter(mAdapter);
 

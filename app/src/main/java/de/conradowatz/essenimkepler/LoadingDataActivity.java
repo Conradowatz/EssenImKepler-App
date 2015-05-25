@@ -3,25 +3,26 @@ package de.conradowatz.essenimkepler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 import org.apache.http.Header;
 
 
-public class LoadingDataActivity extends ActionBarActivity implements View.OnClickListener {
+public class LoadingDataActivity extends AppCompatActivity implements View.OnClickListener {
 
     private boolean isnoConnection = false;
     private TextView loadingText;
     private TextView noconnectionText;
-    private ProgressBar progressBar;
+    private ProgressWheel progressBar;
     private ImageView cloudImage;
     private ImageView logoImage;
     private RelativeLayout layout;
@@ -37,7 +38,7 @@ public class LoadingDataActivity extends ActionBarActivity implements View.OnCli
 
         loadingText = (TextView) findViewById(R.id.loadingData_laden_textView);
         noconnectionText = (TextView) findViewById(R.id.loadingData_noconnection_textView);
-        progressBar = (ProgressBar) findViewById(R.id.loadingData_progressBar);
+        progressBar = (ProgressWheel) findViewById(R.id.loadingData_progressBar);
         cloudImage = (ImageView) findViewById(R.id.loadingData_cloud_imageView);
         logoImage = (ImageView) findViewById(R.id.loadingData_logo_imageView);
         layout = (RelativeLayout) findViewById(R.id.loadingData_layout);
