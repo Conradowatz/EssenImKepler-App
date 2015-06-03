@@ -18,6 +18,9 @@ import android.widget.AdapterView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -49,8 +52,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        //Get an Analytics tracker to report app starts and uncaught exceptions etc.
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //Stop the analytics tracking
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Get a Tracker (should auto-report)
+        ((MyApplication) getApplication()).getTracker(MyApplication.TrackerName.APP_TRACKER);
+
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -96,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                             if (currentlySelected!=position) {
                                 setFragment(position);
                                 currentlySelected = position;
+                                return false;
                             }
                         } else {
                             navigationDrawer.setSelection(currentlySelected, false);
@@ -104,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == 2) {
                                 logOutClicked();
                             }
-                            return false;
                         }
                         return true;
                     }
@@ -163,6 +186,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showInfoDialog() {
+
+        // Get tracker.
+        Tracker t = ((MyApplication) getApplication()).getTracker(
+                MyApplication.TrackerName.APP_TRACKER);
+        // Set screen name.
+        t.setScreenName("MainActivity");
+        // Send a screen view.
+        t.send(new HitBuilders.EventBuilder()
+        .setCategory("UX")
+        .setAction("click")
+        .setLabel("Info Dialog").build());
 
         LayoutInflater inflater = getLayoutInflater();
         View scrollView = inflater.inflate(R.layout.infotext_dialog, null);

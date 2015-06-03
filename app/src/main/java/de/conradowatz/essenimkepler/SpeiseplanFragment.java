@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +31,14 @@ public class SpeiseplanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Get tracker.
+        Tracker t = ((MyApplication) getActivity().getApplication()).getTracker(
+                MyApplication.TrackerName.APP_TRACKER);
+        // Set screen name.
+        t.setScreenName("Speiseplan");
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
 
         contentView = inflater.inflate(R.layout.fragment_speiseplan, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.speisePlan_recyclerView);
