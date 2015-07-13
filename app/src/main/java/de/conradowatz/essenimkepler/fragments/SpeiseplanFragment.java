@@ -1,20 +1,22 @@
-package de.conradowatz.essenimkepler;
+package de.conradowatz.essenimkepler.fragments;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import java.util.ArrayList;
-import java.util.List;
+
+import de.conradowatz.essenimkepler.MyApplication;
+import de.conradowatz.essenimkepler.R;
+import de.conradowatz.essenimkepler.activities.MainActivity;
+import de.conradowatz.essenimkepler.tools.MultiTagAdapter;
+import de.conradowatz.essenimkepler.variables.Essen;
+import de.conradowatz.essenimkepler.variables.EssenTag;
 
 
 public class SpeiseplanFragment extends Fragment {
@@ -32,35 +34,34 @@ public class SpeiseplanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Get tracker.
-        Tracker t = ((MyApplication) getActivity().getApplication()).getTracker(
-                MyApplication.TrackerName.APP_TRACKER);
-        // Set screen name.
-        t.setScreenName("Speiseplan");
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
+        //Anaytics
+        MyApplication analytics = (MyApplication) getActivity().getApplication();
+        analytics.fireScreenHit("Speiseplan");
 
         contentView = inflater.inflate(R.layout.fragment_speiseplan, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.speisePlan_recyclerView);
 
-        displayInfo(((MainActivity)getActivity()).essenListe);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity.essenAPI == null) return contentView;
+
+        displayInfo(mainActivity.essenAPI.getEssenTagList());
 
         return contentView;
     }
 
-    public void displayInfo(List<EssenTag> essenListe) {
+    public void displayInfo(ArrayList<EssenTag> essenListe) {
 
-        List<EssenTag> speisePlan = new ArrayList<>();
+        ArrayList<EssenTag> speisePlan = new ArrayList<>();
 
         //Verzicht aussortieren
         for (EssenTag tag: essenListe) {
-            List<Essen> selectedEssen = new ArrayList<>();
-            for (Essen essen : tag.essens) {
-                if (!essen.desc.startsWith("Verzicht")) {
+            ArrayList<Essen> selectedEssen = new ArrayList<>();
+            for (Essen essen : tag.getEssenList()) {
+                if (!essen.getDesc().startsWith("Verzicht")) {
                     selectedEssen.add(essen);
                 }
             }
-            speisePlan.add(new EssenTag(tag.datum, selectedEssen, tag.selected));
+            speisePlan.add(new EssenTag(tag.getDatum(), selectedEssen, tag.getSelected()));
         }
 
         //Recycler mit Essen vollstopfen

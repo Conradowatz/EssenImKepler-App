@@ -1,4 +1,4 @@
-package de.conradowatz.essenimkepler;
+package de.conradowatz.essenimkepler.tools;
 
 
 import android.app.Activity;
@@ -16,30 +16,32 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+
+import de.conradowatz.essenimkepler.R;
+import de.conradowatz.essenimkepler.variables.Essen;
+import de.conradowatz.essenimkepler.variables.EssenTag;
 
 public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHolder> {
 
-    private List<EssenTag> essenListe;
-    private List<Integer> realEssens = new ArrayList<>();
-    private Context context;
-
     private static int VIEWTYPE_CARD = 0;
     private static int VIEWTYPE_DIVIDER = 1;
+    private ArrayList<EssenTag> essenListe;
+    private ArrayList<Integer> realEssens = new ArrayList<>();
+    private Context context;
 
-    public MultiTagAdapter(Context context, List<EssenTag> essenListe) {
+    public MultiTagAdapter(Context context, ArrayList<EssenTag> essenListe) {
 
         this.context = context;
 
         //Wochendivider berechnen
-        List<EssenTag> tmpEssenListe = new ArrayList<>();
+        ArrayList<EssenTag> tmpEssenListe = new ArrayList<>();
         for (int i = 0; i<essenListe.size(); i++) {
             EssenTag thisTag = essenListe.get(i);
 
-            String date = thisTag.datum.split(",")[1];
+            String date = thisTag.getDatum().split(",")[1];
             String datePrev = date;
             if (i>0) {
-                datePrev = essenListe.get(i - 1).datum.split(",")[1];
+                datePrev = essenListe.get(i - 1).getDatum().split(",")[1];
             }
             Date nowDate = new SimpleDateFormat("dd.MM.yyyy").parse(date, new ParsePosition(0));
             Date prevDate = new SimpleDateFormat("dd.MM.yyyy").parse(datePrev, new ParsePosition(0));
@@ -77,15 +79,15 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         EssenTag essenTag = essenListe.get(position);
-        if (essenTag.essens==null) {
+        if (essenTag.getEssenList() == null) {
             return;
         }
 
         //Datum setzen
-        holder.dateText.setText(essenTag.datum);
+        holder.dateText.setText(essenTag.getDatum());
 
         //Wenn der heutige Tag -> highlighten, anzeigen
-        String date = essenTag.datum.split(",")[1];
+        String date = essenTag.getDatum().split(",")[1];
         Date stringDate = new SimpleDateFormat("dd.MM.yyyy").parse(date, new ParsePosition(0));
         Calendar currentCalendar = Calendar.getInstance();
         Calendar dayCalendar = Calendar.getInstance();
@@ -103,12 +105,12 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
             holder.highlight.setVisibility(View.INVISIBLE);
         }
 
-        addMealstoLayout(essenTag.essens, holder.mealLayout);
+        addMealstoLayout(essenTag.getEssenList(), holder.mealLayout);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (essenListe.get(position).datum.equals("DIVIDER")) {
+        if (essenListe.get(position).getDatum().equals("DIVIDER")) {
             return VIEWTYPE_DIVIDER;
         }
         return VIEWTYPE_CARD;
@@ -119,24 +121,7 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
         return essenListe.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView dateText;
-        public LinearLayout mealLayout;
-        public View highlight;
-        public RelativeLayout layout;
-        public TextView specailDayText;
-
-        public ViewHolder(View v) {
-            super(v);
-            highlight =  v.findViewById(R.id.tag_multi_highlight);
-            layout = (RelativeLayout) v.findViewById(R.id.tag_multi_layout);
-            dateText = (TextView) v.findViewById(R.id.tag_multi_date_textView);
-            specailDayText = (TextView) v.findViewById(R.id.tag_multi_specialDay_textView);
-            mealLayout = (LinearLayout) v.findViewById(R.id.tag_multi_meal_linearLayout);
-        }
-    }
-
-    private void addMealstoLayout(List<Essen> essens, LinearLayout layout) {
+    private void addMealstoLayout(ArrayList<Essen> essens, LinearLayout layout) {
 
         layout.removeAllViews();
 
@@ -148,17 +133,34 @@ public class MultiTagAdapter extends RecyclerView.Adapter<MultiTagAdapter.ViewHo
             TextView descText = (TextView) v.findViewById(R.id.meal_row_desc_textView);
             TextView priceText = (TextView) v.findViewById(R.id.meal_row_price_textView);
 
-            String desc = essen.desc.replaceAll(" \\((.*?)\\)", "");
+            String desc = essen.getDesc().replaceAll(" \\((.*?)\\)", "");
             if (desc.startsWith("Verzicht")) {
                 descText.setText("Kein Essen");
                 priceText.setText("");
             } else {
                 descText.setText(desc);
-                priceText.setText(essen.price + " €");
+                priceText.setText(essen.getPrice() + " €");
             }
 
             layout.addView(v);
 
+        }
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView dateText;
+        public LinearLayout mealLayout;
+        public View highlight;
+        public RelativeLayout layout;
+        public TextView specailDayText;
+
+        public ViewHolder(View v) {
+            super(v);
+            highlight = v.findViewById(R.id.tag_multi_highlight);
+            layout = (RelativeLayout) v.findViewById(R.id.tag_multi_layout);
+            dateText = (TextView) v.findViewById(R.id.tag_multi_date_textView);
+            specailDayText = (TextView) v.findViewById(R.id.tag_multi_specialDay_textView);
+            mealLayout = (LinearLayout) v.findViewById(R.id.tag_multi_meal_linearLayout);
         }
     }
 }

@@ -1,8 +1,8 @@
-package de.conradowatz.essenimkepler;
+package de.conradowatz.essenimkepler.fragments;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import java.util.ArrayList;
-import java.util.List;
+
+import de.conradowatz.essenimkepler.MyApplication;
+import de.conradowatz.essenimkepler.R;
+import de.conradowatz.essenimkepler.activities.MainActivity;
+import de.conradowatz.essenimkepler.tools.MultiTagAdapter;
+import de.conradowatz.essenimkepler.variables.Essen;
+import de.conradowatz.essenimkepler.variables.EssenTag;
 
 
 public class BestellungenFragment extends Fragment {
@@ -32,31 +34,33 @@ public class BestellungenFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Get tracker.
-        Tracker t = ((MyApplication) getActivity().getApplication()).getTracker(
-                MyApplication.TrackerName.APP_TRACKER);
-        // Set screen name.
-        t.setScreenName("Meine Bestellungen");
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
+        //Analytics
+        MyApplication analytics = (MyApplication) getActivity().getApplication();
+        analytics.fireScreenHit("Meine Bestellungen");
 
         contentView = inflater.inflate(R.layout.fragment_bestellungen, container, false);
         tagRecycler = (RecyclerView) contentView.findViewById(R.id.bestellungen_recyclerView);
 
-        displayInfo(((MainActivity)getActivity()).essenListe);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity.essenAPI == null) {
+            Log.d("si", "si");
+            return contentView;
+        }
+
+        displayInfo(mainActivity.essenAPI.getEssenTagList());
 
         return contentView;
     }
 
-    public void displayInfo(List<EssenTag> essenListe) {
+    public void displayInfo(ArrayList<EssenTag> essenListe) {
 
-        List<EssenTag> bestellungsListe = new ArrayList<>();
+        ArrayList<EssenTag> bestellungsListe = new ArrayList<>();
 
         //nur selektierte Essen aussortieren
         for (EssenTag tag: essenListe) {
-            List<Essen> selectedEssen = new ArrayList<>();
-            selectedEssen.add(tag.essens.get(tag.selected));
-            bestellungsListe.add(new EssenTag(tag.datum, selectedEssen, tag.selected));
+            ArrayList<Essen> selectedEssen = new ArrayList<>();
+            selectedEssen.add(tag.getEssenList().get(tag.getSelected()));
+            bestellungsListe.add(new EssenTag(tag.getDatum(), selectedEssen, tag.getSelected()));
         }
 
         //Recycler mit Essen vollstopfen

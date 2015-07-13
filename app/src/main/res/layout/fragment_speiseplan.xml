@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.conradowatz.essenimkepler.SpeiseplanFragment">
+    tools:context="de.conradowatz.essenimkepler.fragments.SpeiseplanFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/speisePlan_recyclerView"

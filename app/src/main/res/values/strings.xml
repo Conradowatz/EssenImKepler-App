@@ -10,4 +10,6 @@
     <string name="lade_daten">Lade Daten...</string>
     <string name="serverprobleme_error">Keine Verbindung zum Server. \nZum erneut Versuchen tippen.</string>
     <string name="willkommens_text">Willkommen bei Essen im Kepler. Bitte logge dich mit deinen Benutzerdaten an, um die App nutzen zu können!</string>
+    <string name="loading_failed_text">Es gab einen Fehler beim herunterladen der Daten vom Server. Warscheinlich ist dies ein Fehler der App, kontaktiere bitte den App-Ersteller.
+        \nWenn du dich auch nicht auf der essen-im-kepler.de Webseite Anmelden kannst handelt es sich um einen Serverfehler oder deine Benutzerdaten sind nicht mehr gültig. In diesem Fall kontaktiere bitte den KJF e.V.</string>
 </resources>

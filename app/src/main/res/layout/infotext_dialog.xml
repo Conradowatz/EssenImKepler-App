@@ -3,11 +3,11 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/infoDialog_textView"
-        android:padding="23dp"
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/infoDialog_text"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:padding="23dp"
+        android:text="@string/infoDialog_text" />
 
 </ScrollView>
